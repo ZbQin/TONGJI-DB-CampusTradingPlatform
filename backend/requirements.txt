@@ -1,0 +1,39 @@
+# Flask核心
+Flask==3.0.0
+Werkzeug==3.0.1
+
+# CORS跨域支持
+Flask-CORS==4.0.0
+
+# 数据库ORM
+Flask-SQLAlchemy==3.1.1
+PyMySQL==1.1.0
+cryptography==41.0.7
+
+# JWT认证
+Flask-JWT-Extended==4.6.0
+
+# 密码加密
+bcrypt==4.1.2
+
+# 邮箱验证
+email-validator==2.1.0
+
+# 环境变量管理
+python-dotenv==1.0.0
+
+# 表单验证
+Flask-WTF==1.2.1
+WTForms==3.1.1
+
+# 图片处理
+Pillow==10.1.0
+
+# 日期时间处理
+python-dateutil==2.8.2
+
+# 请求库
+requests==2.31.0
+
+# JSON处理
+simplejson==3.19.2
