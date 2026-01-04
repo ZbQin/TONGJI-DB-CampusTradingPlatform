@@ -56,16 +56,19 @@
           
           <el-form-item label="商品图片">
             <el-upload
-              class="avatar-uploader"
+              class="image-uploader"
               action="#"
-              :show-file-list="false"
+              list-type="picture-card"
               :auto-upload="false"
               :on-change="handleFileChange"
+              :on-remove="handleRemove"
+              :file-list="fileList"
+              multiple
+              accept="image/*"
             >
-              <img v-if="imageUrl" :src="imageUrl" class="avatar" />
-              <el-icon v-else class="avatar-uploader-icon"><Plus /></el-icon>
+              <el-icon><Plus /></el-icon>
             </el-upload>
-            <div class="upload-tip">支持 jpg/png 格式，大小不超过 2MB</div>
+            <div class="upload-tip">支持 jpg/png 格式，大小不超过 2MB，第一张图将作为封面</div>
           </el-form-item>
           
           <el-form-item>
@@ -90,8 +93,8 @@ import { getCategoryList } from '@/api/category'
 const router = useRouter()
 const publishFormRef = ref(null)
 const loading = ref(false)
-const uploadedImages = ref([])
 const imageFiles = ref([])
+const fileList = ref([])
 const categories = ref([])
 
 const form = reactive({
@@ -121,7 +124,16 @@ const loadCategories = async () => {
 }
 
 const handleFileChange = (file) => {
-  imageFiles.value.push(file.raw)
+  if (file.raw) {
+    imageFiles.value.push(file.raw)
+  }
+}
+
+const handleRemove = (file) => {
+  const index = fileList.value.findIndex(f => f.uid === file.uid)
+  if (index > -1) {
+    imageFiles.value.splice(index, 1)
+  }
 }
 
 const goHome = () => {
@@ -177,70 +189,88 @@ onMounted(() => {
 <style scoped>
 .publish-container {
   min-height: 100vh;
-  background: var(--bg-page);
+  background: #f0f7ff;
+  padding-top: 70px;
 }
 
 .page-shell {
-  max-width: 900px;
-  margin: 20px auto;
-  padding: 0 20px;
+  max-width: 100%;
+  margin: 0;
+  padding: 24px 40px;
 }
 
 .publish-card {
-  border-radius: 14px;
+  border-radius: 8px;
+  background: #ffffff;
+  border: 1px solid #e3f2fd;
+  box-shadow: 0 2px 8px rgba(33, 150, 243, 0.1);
 }
 
 .card-header {
-  font-size: 18px;
+  font-size: 20px;
   font-weight: bold;
+  color: #1976d2;
 }
 
 .publish-hero {
-  margin-bottom: 16px;
+  margin-bottom: 20px;
+  padding: 24px;
+  background: #ffffff;
+  border-radius: 8px;
+  border: 1px solid #e3f2fd;
+  box-shadow: 0 2px 8px rgba(33, 150, 243, 0.1);
   display: flex;
   justify-content: space-between;
   align-items: center;
   gap: 12px;
 }
 
-.unit {
-  margin-left: 10px;
+.publish-hero h2 {
+  font-size: 24px;
+  margin: 8px 0 4px 0;
+  color: #303133;
+}
+
+.publish-hero .section-sub {
+  margin: 0;
+  color: #909399;
+  font-size: 14px;
+}
+
+.publish-form {
+  padding: 8px 0;
+}
+
+.publish-form :deep(.el-form-item) {
+  margin-bottom: 18px;
+}
+
+.publish-form :deep(.el-form-item__label) {
+  font-weight: 500;
   color: #606266;
 }
 
-.avatar-uploader .el-upload {
-  border: 1px dashed #d9d9d9;
-  border-radius: 6px;
-  cursor: pointer;
-  position: relative;
-  overflow: hidden;
-  transition: var(--el-transition-duration-fast);
+.unit {
+  margin-left: 10px;
+  color: #909399;
 }
 
-.avatar-uploader .el-upload:hover {
-  border-color: var(--el-color-primary);
+.image-uploader :deep(.el-upload--picture-card) {
+  width: 120px;
+  height: 120px;
+  line-height: 120px;
+  border-radius: 8px;
 }
 
-.avatar-uploader-icon {
-  font-size: 28px;
-  color: #8c939d;
-  width: 148px;
-  height: 148px;
-  text-align: center;
-  line-height: 148px;
-  border: 1px dashed #d9d9d9;
-  border-radius: 6px;
-}
-
-.avatar {
-  width: 148px;
-  height: 148px;
-  display: block;
+.image-uploader :deep(.el-upload-list__item) {
+  width: 120px;
+  height: 120px;
+  border-radius: 8px;
 }
 
 .upload-tip {
   font-size: 12px;
   color: #909399;
-  margin-top: 5px;
+  margin-top: 8px;
 }
 </style>

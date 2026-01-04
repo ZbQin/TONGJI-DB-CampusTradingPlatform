@@ -62,6 +62,7 @@
 <script>
 import { ref, reactive } from 'vue'
 import { useRouter } from 'vue-router'
+import { useStore } from 'vuex'
 import { ElMessage } from 'element-plus'
 import { login } from '@/api/auth'
 
@@ -69,6 +70,7 @@ export default {
   name: 'Login',
   setup() {
     const router = useRouter()
+    const store = useStore()
     const loading = ref(false)
     const rememberMe = ref(false)
 
@@ -104,8 +106,8 @@ export default {
             const response = await login(passwordForm)
             if (response.code === 200) {
               // 保存token和用户信息
-              localStorage.setItem('token', response.data.token)
-              localStorage.setItem('userInfo', JSON.stringify(response.data.user_info))
+              store.commit('SET_TOKEN', response.data.token)
+              store.commit('SET_USER_INFO', response.data.user_info)
               
               ElMessage.success({
                 message: '登录成功',

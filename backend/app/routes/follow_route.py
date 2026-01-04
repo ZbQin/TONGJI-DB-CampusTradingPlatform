@@ -100,17 +100,27 @@ def get_followers():
 
 
 @follow_bp.route('/check', methods=['GET'])
-@jwt_required()
 def check_following():
     """检查是否关注某用户"""
-    current_user_id = int(get_jwt_identity())
+    from flask_jwt_extended import get_jwt_identity, verify_jwt_in_request
+    from flask_jwt_extended.exceptions import NoAuthorizationError
     
     followee_id = request.args.get('user_id', type=int)
     
     if not followee_id:
         return jsonify({'code': 400, 'message': '用户ID不能为空'}), 400
     
-    result = sql_check_following(current_user_id, followee_id)
+    # 尝试获取当前用户，如果未登录则返回未关注
+    try:
+        verify_jwt_in_request(optional=True)
+        current_user_id = get_jwt_identity()
+        if current_user_id:
+            current_user_id = int(current_user_id)
+            result = sql_check_following(current_user_id, followee_id)
+        else:
+            result = {'is_following': False}
+    except (NoAuthorizationError, Exception):
+        result = {'is_following': False}
     
     return jsonify({
         'code': 200,
@@ -120,13 +130,26 @@ def check_following():
 
 
 @follow_bp.route('/stats', methods=['GET'])
-@jwt_required()
 def get_follow_stats():
     """获取关注统计"""
-    current_user_id = int(get_jwt_identity())
+    from flask_jwt_extended import get_jwt_identity, verify_jwt_in_request
+    from flask_jwt_extended.exceptions import NoAuthorizationError
     
-    # 可选：查询其他用户的统计
-    user_id = request.args.get('user_id', current_user_id, type=int)
+    # 可选：查询其他用户的统计，否则查询当前用户
+    user_id = request.args.get('user_id', type=int)
+    
+    if not user_id:
+        # 如果没有传user_id，尝试从JWT获取当前用户
+        try:
+            verify_jwt_in_request()
+            current_user_id = get_jwt_identity()
+            if current_user_id:
+                user_id = int(current_user_id)
+        except (NoAuthorizationError, Exception):
+            return jsonify({'code': 401, 'message': '请先登录'}), 401
+    
+    if not user_id:
+        return jsonify({'code': 400, 'message': '用户ID不能为空'}), 400
     
     result = sql_get_follow_stats(user_id)
     

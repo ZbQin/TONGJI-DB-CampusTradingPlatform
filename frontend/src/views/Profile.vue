@@ -96,6 +96,7 @@
 
 <script setup>
 import { ref, onMounted, reactive } from 'vue'
+import { useStore } from 'vuex'
 import { getUserInfo, updateProfile, changePassword, uploadAvatar } from '@/api/auth'
 import { ElMessage } from 'element-plus'
 import { Plus } from '@element-plus/icons-vue'
@@ -118,6 +119,7 @@ const passwordForm = reactive({
 })
 
 const passwordFormRef = ref(null)
+const store = useStore()
 
 const passwordRules = {
   old_password: [{ required: true, message: '请输入原密码', trigger: 'blur' }],
@@ -143,6 +145,8 @@ const fetchUserInfo = async () => {
     const res = await getUserInfo()
     if (res.code === 200) {
       userInfo.value = res.data
+      // 同步全局用户信息，确保导航栏等位置头像一致
+      store.commit('SET_USER_INFO', res.data)
       // 处理头像URL，如果是相对路径，可能需要拼接后端地址
       // 这里假设后端返回的是 /static/... 这样的路径
       // 如果前端和后端在不同端口，可能需要拼接 baseURL
@@ -214,6 +218,11 @@ const handleAvatarUpload = async (options) => {
     if (res.code === 200) {
       ElMessage.success('头像上传成功')
       userInfo.value.avatar = res.data.avatar_url
+      // 同步更新全局用户信息，确保导航栏头像即时刷新
+      store.commit('SET_USER_INFO', {
+        ...(store.state.userInfo || {}),
+        avatar: res.data.avatar_url
+      })
     } else {
       ElMessage.error(res.message)
     }
@@ -231,20 +240,67 @@ onMounted(() => {
 <style scoped>
 .profile-container {
   min-height: 100vh;
-  background: var(--bg-page);
+  background: #f0f7ff;
+  padding-top: 70px;
 }
 
 .page-shell {
-  max-width: 880px;
-  margin: 0 auto;
-  padding: 20px;
+  max-width: 100%;
+  margin: 0;
+  padding: 24px 40px;
 }
 
 .profile-hero {
-  margin-bottom: 16px;
+  margin-bottom: 20px;
+  padding: 24px;
+  background: #ffffff;
+  border-radius: 8px;
+  border: 1px solid #e3f2fd;
+  box-shadow: 0 2px 8px rgba(33, 150, 243, 0.1);
   display: flex;
   align-items: center;
   justify-content: space-between;
+}
+
+.profile-hero h2 {
+  font-size: 24px;
+  margin: 8px 0 4px 0;
+  color: #303133;
+}
+
+.profile-hero .section-sub {
+  margin: 0;
+  color: #909399;
+  font-size: 14px;
+}
+
+.profile-hero .floating-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+  color: #1976d2;
+  font-size: 12px;
+  border-radius: 12px;
+  margin-bottom: 8px;
+}
+
+.box-card {
+  border-radius: 8px;
+  background: #ffffff;
+  border: 1px solid #e3f2fd;
+  box-shadow: 0 2px 8px rgba(33, 150, 243, 0.1);
+}
+
+.card-header {
+  font-size: 18px;
+  font-weight: bold;
+  color: #1976d2;
+}
+
+.user-info-form {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 20px 0;
 }
 
 .avatar-uploader .avatar {

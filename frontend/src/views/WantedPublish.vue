@@ -105,28 +105,65 @@ onMounted(loadCategories)
 <style scoped>
 .wanted-publish-container {
   min-height: 100vh;
-  background: var(--bg-page);
+  background: #f0f7ff;
+  padding-top: 70px;
 }
+
 .page-shell {
-  max-width: 840px;
-  margin: 20px auto;
-  padding: 0 20px 30px;
+  max-width: 100%;
+  margin: 0;
+  padding: 24px 40px;
 }
+
+.soft-card {
+  border-radius: 8px;
+  background: #ffffff;
+  border: 1px solid #e3f2fd;
+  box-shadow: 0 2px 8px rgba(33, 150, 243, 0.1);
+}
+
 .card-header {
-  font-size: 18px;
-  font-weight: 600;
+  font-size: 20px;
+  font-weight: bold;
+  color: #1976d2;
 }
 
 .publish-hero {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 16px;
+  margin-bottom: 20px;
+  padding: 24px;
+  background: #ffffff;
+  border-radius: 8px;
+  border: 1px solid #e3f2fd;
+  box-shadow: 0 2px 8px rgba(33, 150, 243, 0.1);
   gap: 12px;
 }
 
+.publish-hero h2 {
+  font-size: 24px;
+  margin: 8px 0 4px 0;
+  color: #303133;
+}
+
+.publish-hero .section-sub {
+  margin: 0;
+  color: #909399;
+  font-size: 14px;
+}
+
 .form-body {
-  padding-top: 8px;
+  padding: 8px 0;
+}
+
+.form-body :deep(.el-form-item) {
+  margin-bottom: 18px;
+}
+
+.form-body :deep(.el-form-item__label) {
+  font-weight: 500;
+  color: #606266;
 }
 
 .actions-row {

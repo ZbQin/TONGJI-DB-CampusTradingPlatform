@@ -119,21 +119,39 @@ onMounted(loadData)
 <style scoped>
 .my-wanted-container {
   min-height: 100vh;
-  background: #f5f7fa;
+  background: #f0f7ff;
+  padding-top: 70px;
 }
+
 .content-wrapper {
-  max-width: 1000px;
-  margin: 20px auto;
-  padding: 0 20px;
+  max-width: 100%;
+  margin: 0;
+  padding: 24px 40px;
 }
+
+.content-wrapper :deep(.el-card) {
+  border-radius: 8px;
+  background: #ffffff;
+  border: 1px solid #e3f2fd;
+  box-shadow: 0 2px 8px rgba(33, 150, 243, 0.1);
+}
+
 .card-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  font-size: 18px;
+  font-weight: bold;
+  color: #1976d2;
 }
+
 .pagination {
-  margin-top: 16px;
+  margin-top: 20px;
   display: flex;
   justify-content: center;
+}
+
+.pagination :deep(.el-pagination.is-background .el-pager li:not(.is-disabled).is-active) {
+  background: #2196f3;
 }
 </style>

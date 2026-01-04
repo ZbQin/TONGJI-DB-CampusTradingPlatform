@@ -67,14 +67,13 @@
               @click="goToProductDetail(product.product_id)"
             >
               <div class="product-image">
-                <img :src="product.image_url || '/placeholder.png'" :alt="product.product_name" />
+                <img :src="getProductImage(product) || '/placeholder.png'" :alt="product.title" />
                 <span class="price-tag">¥{{ product.price }}</span>
               </div>
               <div class="product-info">
-                <h4 class="product-name">{{ product.product_name }}</h4>
-                <p class="product-desc">{{ product.description }}</p>
+                <h4 class="product-name">{{ product.title }}</h4>
                 <div class="product-meta">
-                  <el-tag size="small" type="info">{{ product.condition }}</el-tag>
+                  <el-tag size="small" type="info" v-if="product.category">{{ product.category }}</el-tag>
                   <span class="time">{{ formatTime(product.created_at) }}</span>
                 </div>
               </div>
@@ -262,6 +261,7 @@ export default {
         isFollowing.value = res.data?.is_following || false
       } catch (error) {
         console.error('检查关注状态失败', error)
+        isFollowing.value = false
       }
 
       try {
@@ -269,6 +269,7 @@ export default {
         followerCount.value = sres.data?.followers_count || 0
       } catch (error) {
         console.error('获取关注统计失败', error)
+        followerCount.value = 0
       }
     }
 
@@ -312,6 +313,14 @@ export default {
       router.push(`/product/${productId}`)
     }
     
+    const getProductImage = (product) => {
+      if (product.images && product.images.length > 0) {
+        // images 可能是数组，取第一个
+        return typeof product.images[0] === 'string' ? product.images[0] : product.images[0]?.image_url
+      }
+      return product.image_url || product.cover_image || ''
+    }
+    
     const formatRating = (rating) => {
       if (!rating) return '0.0'
       return Number(rating).toFixed(1)
@@ -348,6 +357,7 @@ export default {
       openReviewModal,
       handleReviewSuccess,
       goToProductDetail,
+      getProductImage,
       formatRating,
       formatTime,
       isFollowing,
@@ -519,22 +529,10 @@ export default {
   font-size: 16px;
   font-weight: bold;
   color: #333;
-  margin: 0 0 8px 0;
+  margin: 0 0 12px 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-}
-
-.product-desc {
-  font-size: 14px;
-  color: #666;
-  margin: 0 0 12px 0;
-  height: 40px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
 }
 
 .product-meta {
