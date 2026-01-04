@@ -11,9 +11,9 @@ def allowed_file(filename: str) -> bool:
 
 
 def save_upload_file(file_storage, subdir: str = 'avatars') -> str:
-    """保存上传的文件到指定目录并返回文件名。
+    """保存上传的文件到指定目录并返回URL路径。
 
-    返回值为文件名(不含路径),调用方自行拼接路径。
+    返回值为相对URL路径，如 /static/uploads/avatars/xxx.jpg
     """
     if file_storage is None:
         return ''
@@ -28,4 +28,5 @@ def save_upload_file(file_storage, subdir: str = 'avatars') -> str:
     file_path = os.path.join(target_dir, filename)
     file_storage.save(file_path)
 
-    return filename
+    # 返回URL路径
+    return f'/static/uploads/{subdir}/{filename}'

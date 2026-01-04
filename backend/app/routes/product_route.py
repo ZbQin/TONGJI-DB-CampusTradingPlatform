@@ -358,8 +358,7 @@ def upload_product_image():
         })
     
     try:
-        filename = save_upload_file(file, 'product')
-        image_url = f'/static/uploads/product/{filename}'
+        image_url = save_upload_file(file, 'product')
         
         return jsonify({
             'code': 200,

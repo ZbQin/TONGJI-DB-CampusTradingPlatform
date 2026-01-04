@@ -257,8 +257,7 @@ def upload_image():
         })
     
     try:
-        filename = save_upload_file(file, 'chat')
-        image_url = f'/static/uploads/chat/{filename}'
+        image_url = save_upload_file(file, 'chat')
         
         return jsonify({
             'code': 200,

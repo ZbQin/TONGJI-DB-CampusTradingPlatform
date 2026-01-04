@@ -16,7 +16,7 @@ class AdminDict(dict):
         self[key] = value
     
     def check_password(self, password: str) -> bool:
-        """验证密码。"""
+        """验证密码（明文比较）。"""
         return self.get('password_hash', '') == password
     
     def to_dict(self) -> dict:

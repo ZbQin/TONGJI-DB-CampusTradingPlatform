@@ -15,7 +15,7 @@ favorite_bp = Blueprint('favorite', __name__, url_prefix='/favorite')
 @jwt_required()
 def add_favorite():
     """添加收藏"""
-    current_user_id = get_jwt_identity()
+    current_user_id = int(get_jwt_identity())
     data = request.get_json()
     
     product_id = data.get('product_id')
@@ -39,7 +39,7 @@ def add_favorite():
 @jwt_required()
 def cancel_favorite():
     """取消收藏"""
-    current_user_id = get_jwt_identity()
+    current_user_id = int(get_jwt_identity())
     data = request.get_json()
     
     product_id = data.get('product_id')
@@ -62,7 +62,7 @@ def cancel_favorite():
 @jwt_required()
 def get_my_favorites():
     """获取我的收藏列表"""
-    current_user_id = get_jwt_identity()
+    current_user_id = int(get_jwt_identity())
     
     page = request.args.get('page', 1, type=int)
     page_size = request.args.get('page_size', 20, type=int)
@@ -80,7 +80,7 @@ def get_my_favorites():
 @jwt_required()
 def check_favorite():
     """检查是否收藏"""
-    current_user_id = get_jwt_identity()
+    current_user_id = int(get_jwt_identity())
     
     product_id = request.args.get('product_id', type=int)
     

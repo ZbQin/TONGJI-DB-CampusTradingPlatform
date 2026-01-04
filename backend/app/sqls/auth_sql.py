@@ -16,7 +16,7 @@ class UserDict(dict):
         self[key] = value
     
     def check_password(self, password: str) -> bool:
-        """验证密码是否与存储的哈希值匹配。"""
+        """验证密码（明文比较）。"""
         return self.get('password_hash', '') == password
     
     def to_dict(self) -> dict:
@@ -29,7 +29,7 @@ class UserDict(dict):
             'bio': self.get('bio'),
             'campus': self.get('campus'),
             'dormitory': self.get('dormitory'),
-            'credit_score': self.get('credit_score', 100),
+            'credit_score': self.get('credit_score', 5),
             'status': self.get('status', 1),
             'created_at': self.get('created_at').strftime('%Y-%m-%d %H:%M:%S') if self.get('created_at') else None,
             'updated_at': self.get('updated_at').strftime('%Y-%m-%d %H:%M:%S') if self.get('updated_at') else None
@@ -62,7 +62,7 @@ def exists_user(username: str = None) -> bool:
 
 def create_user(username: str = None, password: str = None, nickname: str = None) -> UserDict:
     """向数据库插入新用户。"""
-    password_hash = generate_password_hash(password)
+    password_hash = password  # 明文存储密码
     now = datetime.now(timezone.utc)
     
     sql = """
@@ -78,8 +78,8 @@ def create_user(username: str = None, password: str = None, nickname: str = None
 
 
 def update_password(user: UserDict, new_password: str) -> None:
-    """更新用户密码哈希值。"""
-    password_hash = generate_password_hash(new_password)
+    """更新用户密码（明文）。"""
+    password_hash = new_password  # 明文存储密码
     sql = "UPDATE user SET password_hash = %s, updated_at = %s WHERE user_id = %s"
     with get_cursor(commit=True) as cursor:
         cursor.execute(sql, (password_hash, datetime.now(timezone.utc), user['user_id']))

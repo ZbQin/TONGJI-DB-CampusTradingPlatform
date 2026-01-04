@@ -2,14 +2,14 @@
 CREATE TABLE IF NOT EXISTS user (
     user_id BIGINT AUTO_INCREMENT PRIMARY KEY,
     username VARCHAR(50) NOT NULL UNIQUE,
-    password_hash VARCHAR(255) NOT NULL,
+    password_hash VARCHAR(255) NOT NULL COMMENT '密码（明文存储）',
     nickname VARCHAR(50) NOT NULL,
     avatar VARCHAR(255) DEFAULT NULL,
     campus VARCHAR(100) DEFAULT NULL,
     dormitory VARCHAR(100) DEFAULT NULL,
     bio TEXT DEFAULT NULL,
-    credit_score INT DEFAULT 5,
-    status TINYINT DEFAULT 1,
+    credit_score INT DEFAULT 5 COMMENT '信用分，默认5分',
+    status TINYINT DEFAULT 1 COMMENT '用户状态: 0-封禁 1-正常',
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     INDEX idx_status (status)
@@ -207,7 +207,7 @@ CREATE TABLE IF NOT EXISTS reports (
 CREATE TABLE IF NOT EXISTS admins (
     admin_id BIGINT AUTO_INCREMENT PRIMARY KEY,
     username VARCHAR(50) NOT NULL UNIQUE,
-    password_hash VARCHAR(255) NOT NULL,
+    password_hash VARCHAR(255) NOT NULL COMMENT '密码（明文存储）',
     role TINYINT DEFAULT 1,
     status TINYINT DEFAULT 1,
     last_login_time DATETIME DEFAULT NULL,
@@ -217,9 +217,10 @@ CREATE TABLE IF NOT EXISTS admins (
     INDEX idx_status (status)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- 插入默认超级管理员 (密码: admin123)
+-- 插入默认超级管理员 (密码: admin123，明文存储)
+-- 注意：生产环境中不建议使用明文密码！
 INSERT INTO admins (username, password_hash, role, status) VALUES 
-('admin', 'scrypt:32768:8:1$LhZGJ3w8VHwZaK2m$9c3f7e8a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e', 0, 1)
+('admin', 'admin123', 0, 1)
 ON DUPLICATE KEY UPDATE username=username;
 
     -- 系统通知表

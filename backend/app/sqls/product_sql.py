@@ -1,4 +1,4 @@
-from ..utils.db_helper import get_cursor  # 执行 SQL 查询
+from ..utils.db_helper import get_cursor  
 from datetime import datetime, timezone
 import json
 
@@ -321,6 +321,10 @@ def sql_update_product(product_id: int, user_id: int, **kwargs) -> bool:
     allowed_fields = ['title', 'description', 'price', 'category_id']
     updates = []
     params = []
+    
+    # 处理category字段名的兼容性
+    if 'category' in kwargs:
+        kwargs['category_id'] = kwargs.pop('category')
     
     for field in allowed_fields:
         if field in kwargs and kwargs[field] is not None:

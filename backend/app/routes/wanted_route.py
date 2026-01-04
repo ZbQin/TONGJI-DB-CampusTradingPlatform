@@ -17,7 +17,7 @@ wanted_bp = Blueprint('wanted', __name__, url_prefix='/wanted')
 @jwt_required()
 def publish_wanted():
     """发布求购"""
-    current_user_id = get_jwt_identity()
+    current_user_id = int(get_jwt_identity())
     data = request.get_json()
     
     title = data.get('title', '').strip()
@@ -100,7 +100,7 @@ def get_wanted_detail():
 @jwt_required()
 def get_my_wanted():
     """获取我的求购列表"""
-    current_user_id = get_jwt_identity()
+    current_user_id = int(get_jwt_identity())
     
     page = request.args.get('page', 1, type=int)
     page_size = request.args.get('page_size', 20, type=int)
@@ -118,7 +118,7 @@ def get_my_wanted():
 @jwt_required()
 def update_wanted_status():
     """更新求购状态"""
-    current_user_id = get_jwt_identity()
+    current_user_id = int(get_jwt_identity())
     data = request.get_json()
     
     wanted_id = data.get('wanted_id')
@@ -146,7 +146,7 @@ def update_wanted_status():
 @jwt_required()
 def delete_wanted():
     """删除求购"""
-    current_user_id = get_jwt_identity()
+    current_user_id = int(get_jwt_identity())
     data = request.get_json()
     
     wanted_id = data.get('wanted_id')

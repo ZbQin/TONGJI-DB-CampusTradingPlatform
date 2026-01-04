@@ -16,8 +16,9 @@ class Config:
     JWT_SECRET_KEY = os.getenv('JWT_SECRET_KEY') or 'dev-jwt-secret'
     JSON_SORT_KEYS = False
     MAX_CONTENT_LENGTH = int(os.getenv('MAX_CONTENT_LENGTH', 16 * 1024 * 1024))
-    UPLOAD_FOLDER = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static', 'uploads', 'avatars')
-    ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
+    # 修复：UPLOAD_FOLDER应该指向static/uploads目录，不包含avatars子目录
+    UPLOAD_FOLDER = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static', 'uploads')
+    ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
 
 class DevelopmentConfig(Config):
     DEBUG = True
