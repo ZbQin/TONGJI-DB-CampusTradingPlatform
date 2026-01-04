@@ -9,7 +9,8 @@ from ..sqls.product_sql import (
     sql_update_product,
     sql_update_product_status,
     sql_delete_product,
-    sql_set_product_cover
+    sql_set_product_cover,
+    sql_replace_product_images
 )
 from ..utils.helpers import allowed_file, save_upload_file
 
@@ -209,6 +210,10 @@ def update_product():
         update_fields['price'] = float(data['price'])
     if 'category' in data:
         update_fields['category'] = data['category']
+    if 'category_id' in data:
+        update_fields['category_id'] = int(data['category_id']) if data['category_id'] is not None else None
+
+    images = data.get('images') if 'images' in data else None
     
     try:
         success = sql_update_product(int(product_id), user_id, **update_fields)
@@ -219,6 +224,16 @@ def update_product():
                 'message': '无权限操作',
                 'data': None
             })
+
+        # 如果携带图片，进行替换
+        if images is not None:
+            img_success = sql_replace_product_images(int(product_id), user_id, images)
+            if not img_success:
+                return jsonify({
+                    'code': 403,
+                    'message': '无权限操作',
+                    'data': None
+                })
         
         from datetime import datetime, timezone
         updated_at = datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S')

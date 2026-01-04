@@ -1,4 +1,5 @@
-from flask import Flask
+from flask import Flask, send_from_directory
+import os
 from .config import config_map
 from .extensions import init_extensions
 
@@ -33,6 +34,13 @@ def create_app(config_name: str = 'default'):
     app.register_blueprint(report_bp)
     app.register_blueprint(admin_bp)
     app.register_blueprint(notification_bp)
+
+    # 配置静态文件服务
+    @app.route('/static/uploads/<path:filename>')
+    def serve_uploads(filename):
+        """提供上传文件的静态访问"""
+        uploads_dir = app.config.get('UPLOAD_FOLDER')
+        return send_from_directory(uploads_dir, filename)
 
     # 健康检查
     @app.route('/health')

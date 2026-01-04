@@ -202,7 +202,9 @@ const getOtherUserAvatar = (session) => {
 // 格式化时间
 const formatTime = (timeStr) => {
   if (!timeStr) return ''
-  const date = new Date(timeStr)
+  // 后端返回的是UTC时间字符串，需要加上'Z'标识或手动转换
+  // 将服务器时间视为UTC时间
+  const date = new Date(timeStr + (timeStr.includes('Z') ? '' : ' UTC'))
   const now = new Date()
   const diff = now - date
   

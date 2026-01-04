@@ -98,7 +98,7 @@ const fetchData = async () => {
 }
 
 const handleEdit = (row) => {
-  ElMessage.info('编辑功能开发中...')
+  router.push(`/product/edit/${row.id}`)
 }
 
 const handleDelete = (row) => {

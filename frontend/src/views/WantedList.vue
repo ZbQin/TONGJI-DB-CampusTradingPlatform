@@ -97,12 +97,8 @@ const loadList = async () => {
       status: filters.status
     })
     if (res.code === 200) {
-      const currentUserId = store.getters.userId
-      // 过滤掉当前用户自己发布的求购
-      const filteredList = (res.data.list || []).filter(item => item.publisher.user_id !== currentUserId)
-      
-      pagination.total = filteredList.length
-      list.value = filteredList
+      pagination.total = res.data.total
+      list.value = res.data.list || []
     }
   } catch (error) {
     ElMessage.error('加载求购失败')

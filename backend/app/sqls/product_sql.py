@@ -344,6 +344,48 @@ def sql_update_product(product_id: int, user_id: int, **kwargs) -> bool:
     return True
 
 
+def sql_replace_product_images(product_id: int, user_id: int, images: list) -> bool:
+    """
+    替换商品图片列表，包含封面设置
+    """
+    if images is None:
+        return True
+
+    # 验证商品归属
+    with get_cursor() as cursor:
+        cursor.execute(
+            "SELECT user_id FROM product WHERE product_id = %s",
+            (product_id,)
+        )
+        product = cursor.fetchone()
+
+    if not product or product['user_id'] != user_id:
+        return False
+
+    now = datetime.now(timezone.utc)
+    with get_cursor(commit=True) as cursor:
+        # 清空旧图片
+        cursor.execute("DELETE FROM product_image WHERE product_id = %s", (product_id,))
+
+        # 重新插入图片，第一张作为封面
+        for idx, img_url in enumerate(images):
+            cursor.execute(
+                """
+                INSERT INTO product_image (product_id, image_url, is_cover, sort_order, created_at, updated_at)
+                VALUES (%s, %s, %s, %s, %s, %s)
+                """,
+                (product_id, img_url, 1 if idx == 0 else 0, idx, now, now)
+            )
+
+        # 同步商品更新时间
+        cursor.execute(
+            "UPDATE product SET updated_at = %s WHERE product_id = %s",
+            (now, product_id)
+        )
+
+    return True
+
+
 def sql_update_product_status(product_id: int, user_id: int, status: int) -> bool:
     """
     修改商品状态

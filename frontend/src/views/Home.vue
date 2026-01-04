@@ -122,11 +122,7 @@ const loadProducts = async () => {
     
     const res = await getProductList(params)
     if (res.code === 200) {
-      const currentUserId = store.getters.userId
-      // 过滤掉当前用户自己发布的商品
-      const filteredList = res.data.list.filter(item => item.seller.user_id !== currentUserId)
-      
-      products.value = filteredList.map(item => ({
+      products.value = res.data.list.map(item => ({
         id: item.product_id,
         title: item.title,
         price: item.price,
@@ -134,7 +130,7 @@ const loadProducts = async () => {
         time: formatTime(item.created_at),
         image: item.images && item.images.length > 0 ? item.images[0] : ''
       }))
-      pagination.total = filteredList.length
+      pagination.total = res.data.total
     }
   } catch (error) {
     ElMessage.error('加载商品列表失败')
@@ -146,8 +142,9 @@ const loadProducts = async () => {
 // 格式化时间
 const formatTime = (timeStr) => {
   if (!timeStr) return ''
+  // 后端返回的是UTC时间，需要正确解析
+  const time = new Date(timeStr + (timeStr.includes('Z') ? '' : ' UTC'))
   const now = new Date()
-  const time = new Date(timeStr)
   const diff = Math.floor((now - time) / 1000)
   
   if (diff < 3600) return `${Math.floor(diff / 60)}分钟前`

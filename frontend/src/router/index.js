@@ -44,6 +44,12 @@ const routes = [
     meta: { requiresAuth: true }
   },
   {
+    path: '/product/edit/:id',
+    name: 'ProductEdit',
+    component: () => import('@/views/ProductEdit.vue'),
+    meta: { requiresAuth: true }
+  },
+  {
     path: '/product/:id',
     name: 'ProductDetail',
     component: () => import('@/views/ProductDetail.vue'),
@@ -83,6 +89,12 @@ const routes = [
     path: '/wanted/publish',
     name: 'WantedPublish',
     component: () => import('@/views/WantedPublish.vue'),
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/wanted/edit/:id',
+    name: 'WantedEdit',
+    component: () => import('@/views/WantedEdit.vue'),
     meta: { requiresAuth: true }
   },
   {

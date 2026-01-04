@@ -36,6 +36,15 @@ export function getMyWantedList(params) {
   })
 }
 
+// 修改求购信息
+export function updateWanted(data) {
+  return request({
+    url: '/wanted/update',
+    method: 'post',
+    data
+  })
+}
+
 // 更新求购状态
 export function updateWantedStatus(wanted_id, status) {
   return request({

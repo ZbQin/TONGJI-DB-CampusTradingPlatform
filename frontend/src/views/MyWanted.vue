@@ -31,6 +31,7 @@
           <el-table-column label="操作" width="160" fixed="right">
             <template #default="{ row }">
               <el-button size="small" @click="goDetail(row.wanted_id)">查看</el-button>
+              <el-button size="small" type="primary" link @click="goEdit(row.wanted_id)">编辑</el-button>
               <el-button size="small" type="danger" @click="remove(row.wanted_id)">删除</el-button>
             </template>
           </el-table-column>
@@ -110,6 +111,7 @@ const remove = (id) => {
 }
 
 const goDetail = (id) => router.push(`/wanted/detail/${id}`)
+const goEdit = (id) => router.push(`/wanted/edit/${id}`)
 
 onMounted(loadData)
 </script>

@@ -14,6 +14,10 @@ module.exports = defineConfig({
         pathRewrite: {
           '^/api': ''
         }
+      },
+      '/static': {
+        target: 'http://localhost:5000',
+        changeOrigin: true
       }
     }
   },

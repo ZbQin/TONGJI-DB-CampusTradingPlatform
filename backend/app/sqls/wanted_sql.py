@@ -188,6 +188,39 @@ def sql_get_my_wanted(user_id: int, page: int = 1, page_size: int = 20) -> Dict:
     }
 
 
+def sql_update_wanted(wanted_id: int, user_id: int, **kwargs) -> bool:
+    """
+    修改求购信息（仅发布者可操作）
+    """
+    # 验证归属
+    with get_cursor() as cursor:
+        cursor.execute("SELECT user_id FROM wanted WHERE wanted_id = %s", (wanted_id,))
+        wanted = cursor.fetchone()
+    if not wanted or wanted['user_id'] != user_id:
+        return False
+
+    allowed_fields = ['title', 'description', 'category_id', 'expected_price']
+    updates = []
+    params = []
+
+    for field in allowed_fields:
+        if field in kwargs and kwargs[field] is not None:
+            updates.append(f"{field} = %s")
+            params.append(kwargs[field])
+
+    if not updates:
+        return True
+
+    updates.append("updated_at = %s")
+    params.append(datetime.now(timezone.utc))
+    params.append(wanted_id)
+
+    sql = f"UPDATE wanted SET {', '.join(updates)} WHERE wanted_id = %s"
+    with get_cursor(commit=True) as cursor:
+        cursor.execute(sql, tuple(params))
+    return True
+
+
 def sql_update_wanted_status(wanted_id: int, user_id: int, status: int) -> bool:
     """
     更新求购状态（只能更新自己的）

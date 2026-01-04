@@ -6,6 +6,7 @@ from ..sqls.wanted_sql import (
     sql_get_wanted_list,
     sql_get_wanted_detail,
     sql_get_my_wanted,
+    sql_update_wanted,
     sql_update_wanted_status,
     sql_delete_wanted
 )
@@ -111,6 +112,49 @@ def get_my_wanted():
         'code': 200,
         'message': '获取成功',
         'data': result
+    })
+
+
+@wanted_bp.route('/update', methods=['POST'])
+@jwt_required()
+def update_wanted():
+    """修改求购信息"""
+    current_user_id = int(get_jwt_identity())
+    data = request.get_json() or {}
+
+    wanted_id = data.get('wanted_id')
+    if not wanted_id:
+        return jsonify({'code': 400, 'message': '求购ID不能为空'}), 400
+
+    update_fields = {}
+    if 'title' in data:
+        title = (data.get('title') or '').strip()
+        if not title:
+            return jsonify({'code': 400, 'message': '标题不能为空'}), 400
+        update_fields['title'] = title
+    if 'description' in data:
+        desc = (data.get('description') or '').strip()
+        if not desc:
+            return jsonify({'code': 400, 'message': '描述不能为空'}), 400
+        update_fields['description'] = desc
+    if 'category_id' in data:
+        update_fields['category_id'] = int(data.get('category_id')) if data.get('category_id') is not None else None
+    if 'expected_price' in data:
+        price = data.get('expected_price')
+        if price is not None and price < 0:
+            return jsonify({'code': 400, 'message': '期望价格必须大于等于0'}), 400
+        update_fields['expected_price'] = float(price) if price is not None else None
+
+    success = sql_update_wanted(int(wanted_id), current_user_id, **update_fields)
+    if not success:
+        return jsonify({'code': 403, 'message': '无权限操作'}), 403
+
+    return jsonify({
+        'code': 200,
+        'message': '更新成功',
+        'data': {
+            'wanted_id': wanted_id
+        }
     })
 
 
