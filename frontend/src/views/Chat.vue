@@ -148,7 +148,8 @@ import {
   sendMessage,
   markMessagesRead,
   uploadChatImage,
-  deleteSession
+  deleteSession,
+  getUserInfo
 } from '@/api/chat'
 
 const router = useRouter()
@@ -182,14 +183,20 @@ const totalUnread = computed(() => {
 // 获取对方用户名
 const getOtherUserName = (session) => {
   const isCurrentUserBuyer = session.buyer_id === currentUserId.value
-  // 可以从会话中获取用户信息，或通过API获取
-  return isCurrentUserBuyer ? `卖家 #${session.seller_id}` : `买家 #${session.buyer_id}`
+  const other = isCurrentUserBuyer ? session.seller : session.buyer
+  if (!other) {
+    return isCurrentUserBuyer ? `卖家 #${session.seller_id}` : `买家 #${session.buyer_id}`
+  }
+  return other.nickname || `用户 #${other.user_id}`
 }
 
 // 获取对方用户头像
 const getOtherUserAvatar = (session) => {
-  // 可以从会话中获取用户信息，或通过API获取
-  return 'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png'
+  const isCurrentUserBuyer = session.buyer_id === currentUserId.value
+  const other = isCurrentUserBuyer ? session.seller : session.buyer
+  const defaultAvatar = 'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png'
+  if (!other) return defaultAvatar
+  return other.avatar || defaultAvatar
 }
 
 // 格式化时间
@@ -212,6 +219,33 @@ const loadSessions = async () => {
     const res = await getSessionList()
     if (res.code === 200) {
       sessions.value = res.data.list || []
+
+      // 补充会话中缺失的用户信息（buyer/seller）以便显示 nickname/avatar
+      const fillPromises = sessions.value.map(async (session) => {
+        // 确定对方 id
+        const isCurrentUserBuyer = session.buyer_id === currentUserId.value
+        const otherId = isCurrentUserBuyer ? session.seller_id : session.buyer_id
+
+        // 如果会话里已经有 buyer/seller 对象则跳过
+        if (isCurrentUserBuyer && session.seller) return
+        if (!isCurrentUserBuyer && session.buyer) return
+
+        try {
+          const r = await getUserInfo(otherId)
+          if (r && r.code === 200 && r.data) {
+            if (isCurrentUserBuyer) {
+              session.seller = r.data
+            } else {
+              session.buyer = r.data
+            }
+          }
+        } catch (e) {
+          // 忽略单条用户获取错误
+          console.error('获取用户信息失败', otherId, e)
+        }
+      })
+
+      await Promise.all(fillPromises)
     }
   } catch (error) {
     ElMessage.error('加载会话列表失败')

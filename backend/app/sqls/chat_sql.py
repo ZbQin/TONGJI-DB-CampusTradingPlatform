@@ -255,3 +255,27 @@ def sql_get_unread_count(user_id: int) -> dict:
         })
     
     return {'sessions': sessions}
+
+
+def sql_get_user_by_id(user_id: int) -> dict:
+    """
+    根据用户 ID 查询用户基础信息（nickname, avatar）
+    返回 None 表示用户不存在
+    """
+    with get_cursor() as cursor:
+        cursor.execute("""
+            SELECT user_id, nickname, avatar
+            FROM user
+            WHERE user_id = %s
+            LIMIT 1
+        """, (user_id,))
+        user = cursor.fetchone()
+
+    if not user:
+        return None
+
+    return {
+        'user_id': user['user_id'],
+        'nickname': user.get('nickname') if isinstance(user, dict) else None,
+        'avatar': user.get('avatar') if isinstance(user, dict) else None
+    }

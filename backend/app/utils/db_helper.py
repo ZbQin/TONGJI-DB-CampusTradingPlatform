@@ -38,12 +38,6 @@ def close_db(e=None):
 
 @contextmanager
 def get_cursor(commit=False):
-    """数据库游标的上下文管理器，支持可选自动提交。
-    
-    用法：
-        with get_cursor(commit=True) as cursor:
-            cursor.execute("INSERT INTO ...")
-    """
     conn = get_db()
     cursor = conn.cursor()
     try:

@@ -74,3 +74,11 @@ export function getUnreadCount() {
     method: 'get'
   })
 }
+
+// 按 user_id 查询用户信息（昵称、头像）
+export function getUserInfo(user_id) {
+  return request({
+    url: `/chat/user/${user_id}`,
+    method: 'get'
+  })
+}

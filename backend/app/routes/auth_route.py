@@ -14,11 +14,6 @@ from datetime import timedelta
 
 auth_bp = Blueprint('auth', __name__, url_prefix='/auth')
 
-
-# `allowed_file` and `save_upload_file` moved to `app.utils.helpers`
-
-
-
 @auth_bp.route('/register', methods=['POST'])
 def register():
     data = request.get_json()

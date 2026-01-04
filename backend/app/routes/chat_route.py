@@ -10,6 +10,7 @@ from ..sqls.chat_sql import (
     sql_delete_session,
     sql_get_unread_count
 )
+from ..sqls.chat_sql import sql_get_user_by_id
 from ..utils.helpers import allowed_file, save_upload_file
 
 chat_bp = Blueprint('chat', __name__, url_prefix='/chat')
@@ -336,4 +337,21 @@ def get_unread_count():
             'message': f'查询失败: {str(e)}',
             'data': None
         })
+
+
+
+@chat_bp.route('/user/<int:user_id>', methods=['GET'])
+@jwt_required()
+def get_user_info(user_id):
+    """
+    根据 user_id 返回昵称与头像，供前端按需查询
+    """
+    try:
+        user = sql_get_user_by_id(user_id)
+        if not user:
+            return jsonify({'code': 404, 'message': '用户不存在', 'data': None})
+
+        return jsonify({'code': 200, 'message': 'success', 'data': user})
+    except Exception as e:
+        return jsonify({'code': 500, 'message': f'查询失败: {str(e)}', 'data': None})
     

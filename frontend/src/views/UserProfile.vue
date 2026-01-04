@@ -127,6 +127,7 @@ import { ChatDotSquare, EditPen } from '@element-plus/icons-vue'
 import NavBar from '@/components/NavBar.vue'
 import ReviewModal from '@/components/ReviewModal.vue'
 import { getUserProducts } from '@/api/product'
+import { getUserInfo as getUserInfoById } from '@/api/chat'
 import { getUserRatingStats, getReviewsByReviewee } from '@/api/review'
 import { addFollow, cancelFollow, checkFollowing, getFollowStats } from '@/api/follow'
 
@@ -165,16 +166,39 @@ export default {
             user_id: userId.value,
             username: firstProduct.seller?.nickname || firstProduct.seller?.username || '未知用户',
             student_id: firstProduct.seller?.student_id || '',
-            phone: firstProduct.seller?.phone || ''
+            phone: firstProduct.seller?.phone || '',
+            avatar: firstProduct.seller?.avatar || ''
           }
           userProducts.value = res.data.list || []
         } else {
-          // 如果没有商品，设置基本用户信息
-          userInfo.value = {
-            user_id: userId.value,
-            username: '用户' + userId.value,
-            student_id: '',
-            phone: ''
+          // 如果没有商品，尝试调用用户信息接口获取 nickname/avatar
+          try {
+            const ures = await getUserInfoById(userId.value)
+            if (ures && ures.code === 200 && ures.data) {
+              userInfo.value = {
+                user_id: userId.value,
+                username: ures.data.nickname || ('用户' + userId.value),
+                student_id: ures.data.student_id || '',
+                phone: ures.data.phone || '',
+                avatar: ures.data.avatar || ''
+              }
+            } else {
+              userInfo.value = {
+                user_id: userId.value,
+                username: '用户' + userId.value,
+                student_id: '',
+                phone: '',
+                avatar: ''
+              }
+            }
+          } catch (e) {
+            userInfo.value = {
+              user_id: userId.value,
+              username: '用户' + userId.value,
+              student_id: '',
+              phone: '',
+              avatar: ''
+            }
           }
           userProducts.value = []
         }
@@ -185,7 +209,8 @@ export default {
           user_id: userId.value,
           username: '用户' + userId.value,
           student_id: '',
-          phone: ''
+          phone: '',
+          avatar: ''
         }
         userProducts.value = []
       }
